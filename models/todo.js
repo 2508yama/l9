@@ -54,6 +54,15 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static completedItems() {
+      return this.findAll({
+        where: {
+          completed: true,
+        },
+        order: [["id", "ASC"]],
+      });
+    }
+
     markAsCompleted() {
       return this.update({ completed: true });
     }
