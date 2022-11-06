@@ -21,18 +21,13 @@ describe("Test case for database", () => {
     }
   });
 
-  test("Creates a todo and responds with json at /todos POST endpoint", async () => {
+  test("Creates a new todo", async () => {
     const response = await agent.post("/todos").send({
       title: "Buy milk",
       dueDate: new Date().toISOString(),
       completed: false,
     });
-    expect(response.statusCode).toBe(200);
-    expect(response.header["content-type"]).toBe(
-      "application/json; charset=utf-8"
-    );
-    const parsedResponse = JSON.parse(response.text);
-    expect(parsedResponse.id).toBeDefined();
+    expect(response.statusCode).toBe(302);
   });
 
   test("Mark todo as a completed", async () => {
