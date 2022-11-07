@@ -1,6 +1,8 @@
-const express = require("express"); //importing express
-const app = express(); // creating new application
+const express = require("express");
+const app = express();
+var csrf = require("tiny-csrf");
 const bodyParser = require("body-parser");
+var cookieParser = require("cookie-parser");
 app.use(bodyParser.json());
 const path = require("path");
 const { Todo } = require("./models");
@@ -8,13 +10,16 @@ const { Todo } = require("./models");
 const todo = require("./models/todo");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
-//SET EJS AS VIEW ENGINE
+app.use(cookieParser("shh! some secret string"));
+app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
+
 app.set("view engine", "ejs");
 app.get("/", async (request, response) => {
   const allTodos = await Todo.getTodos();
   const overdue = await Todo.overdue();
   const dueLater = await Todo.dueLater();
   const dueToday = await Todo.dueToday();
+  const completedItems = await Todo.completedItems();
   if (request.accepts("html")) {
     response.render("index", {
       title: "Todo Application",
@@ -22,9 +27,11 @@ app.get("/", async (request, response) => {
       overdue,
       dueLater,
       dueToday,
+      completedItems,
+      csrfToken: request.csrfToken(),
     });
   } else {
-    response.json(overdue, dueLater, dueToday);
+    response.json(overdue, dueLater, dueToday, completedItems);
   }
 });
 
@@ -65,11 +72,11 @@ app.post("/todos", async (request, response) => {
   }
 });
 //PUT https://mytodoapp.com/todos/123/markAscomplete
-app.put("/todos/:id/markAsCompleted", async (request, response) => {
-  console.log("we have to update a todo with ID:", request.params.id);
+app.put("/todos/:id", async (request, response) => {
+  console.log("Mark Todo as completed:", request.params.id);
   const todo = await Todo.findByPk(request.params.id);
   try {
-    const updatedtodo = await todo.markAsCompleted();
+    const updatedtodo = await todo.setCompletionStatus(request.body.completed);
     return response.json(updatedtodo);
   } catch (error) {
     console.log(error);
