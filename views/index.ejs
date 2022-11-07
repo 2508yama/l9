@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vineeth Todo Manager</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/css/style.css" />
-    <script>
-      function updateTodo(id) {
-        fetch(`/todos/${id}/markAsCompleted`,{
-          method: "put",
-          headers: {"Content-Type":"application/json"},
-        })
-         .then((res) => {
-          if (res.ok) {
-            window.location.reload();
-          }
-         })
-         .catch((err) => console.erroe(err));
-      }
-      function deleteTodo(id) {
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link href="./css/style.css" rel="stylesheet">
+        <title>Vineeth Todo Manager</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="./css/style.css" rel="stylesheet">
+        <script>
+            function updateTodo(id) {
+              fetch(`/todos/${id}/markAsCompleted`,{
+                method: "put",
+                headers: {"Content-Type":"application/json"},
+              })
+               .then((res) => {
+                if (res.ok) {
+                  window.location.reload();
+                }
+               })
+               .catch((err) => console.erroe(err));
+            }
+            function deleteTodo(id) {
         fetch(`/todos/${id}`,{
           method: "delete",
           headers: {"Content-Type":"application/json"},
@@ -31,29 +33,29 @@
          })
          .catch((err) => console.erroe(err));
       }
-    </script>
-  </head>
-  <body>
-    <div class="grid grid-cols-6">
-      <div class="col-start-3 col-span-2">
-        <%- include("header.ejs") %>
+        </script>
+    </head>
+    <body>
+       <div class= "grid  grid-cols-6">
+        <div class="col-start-3 col-span-2">
+        <%- include("header.ejs") %> 
         <form action="/todos" method="post">
-          <div class="flex gap-2 py-4">
+            <div class="flex gap-2 py-4">
+                <div class="flex-auto">
+                    <input type="text" name="title" placeholder="what's next" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm" required />
+                </div>
             <div class="flex-auto">
-              <input type="text" name="title" placeholder="What's next?" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm" required/>
-            </div>
-            <div class="flex-auto">
-              <input type="date" name="dueDate" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4" />
+                <input type="date" name="dueDate" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4 " />
             </div>
             <div class="flex-none">
-              <button type="submit" class="bg-green-600 text-white px-5 py-1.5 rounded font-medium mr-2 mb-2">Add </button>
+                <button type="submit" class="bg-green-600 text-white px-5 py-1.5 rounded font-medium mr-2 mb-2">Add</button>
+            </div>  
             </div>
-          </div>
         </form>
         <%- include('todos.ejs', {title: "Overdue", data: overdue}) %>
         <%- include('todos.ejs', {title: "Due Today", data: dueToday}) %>
         <%- include('todos.ejs', {title: "Due Later", data: dueLater}) %>
-      </div>
     </div>
-  </body>
+</div>
+    </body>
 </html>
