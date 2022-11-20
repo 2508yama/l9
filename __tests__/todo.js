@@ -11,7 +11,7 @@ function extractCsrfToken(res) {
   return $("[name=_csrf]").val();
 }
 
-describe("Todo test suite ", () => {
+describe("Todo test cases ", () => {
   beforeAll(async () => {
     await db.sequelize.sync({ force: true });
     server = app.listen(4000, () => {});
@@ -21,6 +21,20 @@ describe("Todo test suite ", () => {
     await db.sequelize.close();
     server.close();
   });
+
+  test("Sign up", async () => {
+    let res = await agent.get("/signup");
+    const csrfToken = extractCsrfToken(res);
+    res = await agent.post("/users").send({
+      firstName: "Test",
+      lastName: "User A",
+      email: "user.a@test.com",
+      password: "12345678",
+      _csrf: csrfToken,
+    });
+    expect(res.statusCode).toBe(302);
+  });
+
   test("Create new todo", async () => {
     const res = await agent.get("/");
     const csrfToken = extractCsrfToken(res);
