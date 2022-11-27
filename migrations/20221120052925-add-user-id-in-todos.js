@@ -6,7 +6,6 @@ module.exports = {
     await queryInterface.addColumn("Todos", "userId", {
       type: Sequelize.DataTypes.INTEGER,
     });
-
     await queryInterface.addConstraint("Todos", {
       fields: ["userId"],
       type: "foreign key",
@@ -24,7 +23,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.renameColumn("Todos", "userId");
+    await queryInterface.removeColumn("Todos", "userId");
     /**
      * Add reverting commands here.
      *
