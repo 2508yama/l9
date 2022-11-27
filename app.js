@@ -8,6 +8,7 @@ const path = require("path");
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
+const flash = require("connect-flash");
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("shh! some secrete string"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 app.use(
   session({
     secret: "my-super-secret-key-32164849846512",
@@ -32,6 +34,12 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
+
+app.use(function (request, response, next) {
+  response.locals.messages = request.flash();
+  next();
+});
 
 passport.use(
   new LocalStrategy(
@@ -41,16 +49,16 @@ passport.use(
     },
     (username, password, done) => {
       User.findOne({ where: { email: username } })
-        .then(async (user) => {
+        .then(async function (user) {
           const result = await bcrypt.compare(password, user.password);
           if (result) {
             return done(null, user);
           } else {
-            return done("Invalid Password");
+            return done(null, false, { message: "Invalid password" });
           }
         })
         .catch((error) => {
-          return error;
+          return done(error);
         });
     }
   )
@@ -137,8 +145,12 @@ app.get("/login", (request, response) => {
 
 app.post(
   "/session",
-  passport.authenticate("local", { failureRedirect: "/login" }),
-  (request, response) => {
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
+  function (request, response) {
+    console.log(request.user);
     response.redirect("/todo");
   }
 );
