@@ -8,12 +8,13 @@ const path = require("path");
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
-const flash = require("connect-flash");
 const LocalStrategy = require("passport-local");
+const flash = require("connect-flash");
 const bcrypt = require("bcrypt");
 
 const saltRounds = 10;
-
+app.set("views", path.join(__dirname, "views"));
+app.use(flash());
 const { Todo, User } = require("./models");
 // eslint-disable-next-line no-unused-vars
 const todo = require("./models/todo");
@@ -23,10 +24,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("shh! some secrete string"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
 app.use(
   session({
-    secret: "my-super-secret-key-32164849846512",
+    secret: "my-super-secret-key-21728172615261562",
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24hours
     },
@@ -34,8 +34,6 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
-
 app.use(function (request, response, next) {
   response.locals.messages = request.flash();
   next();
@@ -118,6 +116,14 @@ app.get("/signup", (request, response) => {
   });
 });
 app.post("/users", async (request, response) => {
+  if (request.body.email.length == 0) {
+    request.flash("error", "Email can not be empty!");
+    return response.redirect("/signup");
+  }
+  if (request.body.firstName.length == 0) {
+    request.flash("error", "First name can not be empty!");
+    return response.redirect("/signup");
+  }
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
   console.log(hashedPwd);
 
@@ -154,7 +160,6 @@ app.post(
     response.redirect("/todo");
   }
 );
-
 app.get("/signout", (request, response, next) => {
   request.logout((err) => {
     if (err) {
@@ -189,11 +194,12 @@ app.post(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    if (request.body.title.length === 0) {
-      request.flash("error", "Todo and date should not be empty");
+    if (request.body.title.length == 0) {
+      request.flash("error", "Title can not be empty!");
       return response.redirect("/todo");
-    } else if (request.body.dueDate.length === 0) {
-      request.flash("error", "Due date should not be empty");
+    }
+    if (request.body.dueDate.length == 0) {
+      request.flash("error", "Due date can not be empty!");
       return response.redirect("/todo");
     }
     console.log("creating new todo", request.body);
