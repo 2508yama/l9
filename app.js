@@ -189,6 +189,13 @@ app.post(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
+    if (request.body.title.length === 0) {
+      request.flash("error", "Todo and date should not be empty");
+      return response.redirect("/todo");
+    } else if (request.body.dueDate.length === 0) {
+      request.flash("error", "Due date should not be empty");
+      return response.redirect("/todo");
+    }
     console.log("creating new todo", request.body);
     try {
       // eslint-disable-next-line no-unused-vars
