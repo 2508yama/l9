@@ -55,8 +55,10 @@ passport.use(
             return done(null, false, { message: "Invalid password" });
           }
         })
-        .catch((error) => {
-          return done(error);
+        .catch(() => {
+          return done(null, false, {
+            message: "Account doesn't exist for this mail",
+          });
         });
     }
   )
@@ -123,6 +125,10 @@ app.post("/users", async (request, response) => {
 
   if (request.body.firstName.length == 0) {
     request.flash("error", "First name can not be empty!");
+    return response.redirect("/signup");
+  }
+  if (request.body.password.length < 8) {
+    request.flash("error", "Password length should be minimun 8");
     return response.redirect("/signup");
   }
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
