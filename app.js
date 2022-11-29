@@ -148,7 +148,11 @@ app.post("/users", async (request, response) => {
       response.redirect("/todo");
     });
   } catch (error) {
-    console.log(error);
+    request.flash(
+      "error",
+      "This mail already having account, try another mail!"
+    );
+    return response.redirect("/signup");
   }
 });
 
