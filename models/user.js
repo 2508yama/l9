@@ -13,7 +13,14 @@ module.exports = (sequelize, DataTypes) => {
       });
       // define association here
     }
+
+    // static firstName(id) {
+    //   return this.findAll({
+    //     where: { id: },
+    //   });
+    // }
   }
+
   User.init(
     {
       firstName: DataTypes.STRING,

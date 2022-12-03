@@ -96,6 +96,7 @@ app.get(
     const dueLater = await Todo.dueLater(loggedInUser);
     const dueToday = await Todo.dueToday(loggedInUser);
     const completedItems = await Todo.completedItems(loggedInUser);
+    //const firstName = await User.firstName(loggedInUser);
     if (request.accepts("html")) {
       response.render("todo", {
         title: "Todo Application",
