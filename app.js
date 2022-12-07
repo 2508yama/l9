@@ -181,17 +181,18 @@ app.get("/signout", (request, response, next) => {
   });
 });
 
-app.get("/todos", async (request, response) => {
-  // defining route to displaying message
-  console.log("Todo list");
-  try {
-    const todoslist = await Todo.findAll();
-    return response.json(todoslist);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
+// app.get("/todos", async (request, response) => {
+//   // defining route to displaying message
+//   console.log("Todo list");
+//   try {
+//     const todoslist = await Todo.findAll();
+//     return response.json(todoslist);
+//   } catch (error) {
+//     console.log(error);
+//     return response.status(422).json(error);
+//   }
+// });
+
 app.get("/todos/:id", async function (request, response) {
   try {
     const todo = await Todo.findByPk(request.params.id);
