@@ -96,7 +96,8 @@ app.get(
     const dueLater = await Todo.dueLater(loggedInUser);
     const dueToday = await Todo.dueToday(loggedInUser);
     const completedItems = await Todo.completedItems(loggedInUser);
-    //const firstName = await User.firstName(loggedInUser);
+    const user = await User.findByPk(loggedInUser);
+    const userName = user.dataValues.firstName;
     if (request.accepts("html")) {
       response.render("todo", {
         title: "Todo Application",
@@ -105,10 +106,11 @@ app.get(
         dueToday,
         dueLater,
         completedItems,
+        userName,
         csrfToken: request.csrfToken(),
       });
     } else {
-      response.json({ overdue, dueToday, dueLater, completedItems });
+      response.json({ overdue, dueToday, dueLater, completedItems, userName });
     }
   }
 );
@@ -231,7 +233,7 @@ app.post(
     }
   }
 );
-//PUT https://mytodoapp.com/todos/123/markAscomplete
+
 app.put(
   "/todos/:id",
   connectEnsureLogin.ensureLoggedIn(),
@@ -249,17 +251,18 @@ app.put(
     }
   }
 );
-app.put("/todos/:id/markAsCompleted", async (request, response) => {
-  console.log("we have to update a todo with ID:", request.params.id);
-  const todo = await Todo.findByPk(request.params.id);
-  try {
-    const updatedtodo = await todo.setCompletionStatus(request.body.completed);
-    return response.json(updatedtodo);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
+
+// app.put("/todos/:id/markAsCompleted", async (request, response) => {
+//   console.log("we have to update a todo with ID:", request.params.id);
+//   const todo = await Todo.findByPk(request.params.id);
+//   try {
+//     const updatedtodo = await todo.setCompletionStatus(request.body.completed);
+//     return response.json(updatedtodo);
+//   } catch (error) {
+//     console.log(error);
+//     return response.status(422).json(error);
+//   }
+// });
 
 app.delete(
   "/todos/:id",
